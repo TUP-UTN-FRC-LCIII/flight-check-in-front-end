@@ -1,0 +1,269 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos para el contenedor de la reserva */
+.reservation {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reservation label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.reservation input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.reservation button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.reservation button:hover {
+  background-color: #0056b3;
+}
+
+/* Detalles de la reserva */
+.reservation-details {
+  background-color: #fff;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reservation-details h3,
+.reservation-details h4 {
+  margin-top: 0;
+}
+
+.reservation-details ul {
+  padding-left: 20px;
+}
+
+/* Estilos para el mapa de asientos */
+.seat-map {
+  background-color: #fff;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.seat-map h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.seat-map h4 {
+  color: #666;
+}
+
+.seat-map p {
+  font-size: 14px;
+  color: #888;
+}
+
+/* Estilos para las filas y asientos */
+.seats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Fila de asientos, con diseño flexible para simular filas en avión */
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Pasillo en el medio */
+.pasillo {
+  width: 20px;
+  background-color: #ccc;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+/* Estilo para los asientos */
+.seat {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border-radius: 25%;
+  cursor: pointer;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Estados de los asientos */
+.seat.available {
+  background-color: #28a745;
+  color: white;
+}
+
+.seat.reserved {
+  background-color: #dc3545;
+  color: white;
+}
+
+.seat.temp {
+  background-color: #ffc107;
+  color: white;
+}
+
+/* Estilos para el mensaje emergente */
+.seat-message {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 10;
+  top: -30px; /* Coloca el mensaje encima del asiento */
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 200px;
+  text-align: center;
+  visibility: hidden;  /* Inicialmente invisible */
+}
+
+.seat-tooltip {
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 1000;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Mostrar el mensaje cuando el asiento tiene un mensaje */
+.seat:hover .seat-message {
+  visibility: visible;
+}
+
+/* Disposición de los asientos por columnas */
+.row-left, .row-right {
+  display: flex;
+  gap: 10px;
+}
+
+/* Asientos de la columna izquierda y derecha */
+.row-left .seat,
+.row-right .seat {
+  align-self: center;
+}
+
+.row-left .seat {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+}
+
+.row-right .seat {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+}
+
+.row-left .seat.available {
+  background-color: #28a745;
+}
+
+.row-right .seat.available {
+  background-color: #28a745;
+}
+
+.row-left .seat.reserved {
+  background-color: #dc3545;
+}
+
+.row-right .seat.reserved {
+  background-color: #dc3545;
+}
+
+.row-left .seat.temp {
+  background-color: #ffc107;
+}
+
+.row-right .seat.temp {
+  background-color: #ffc107;
+}
+
+.error-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.error-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.error-content h3 {
+  margin: 0 0 10px 0;
+  color: #dc3545;
+}
+
+.error-content p {
+  margin: 0 0 20px 0;
+  color: #555;
+}
+
+.error-content button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-content button:hover {
+  background-color: #0056b3;
+}

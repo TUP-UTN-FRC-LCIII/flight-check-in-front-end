@@ -1,0 +1,81 @@
+<div class="reservation">
+  <label for="reservationCode">Código de reserva:</label>
+  <input type="text" id="reservationCode" [(ngModel)]="reservationCode" placeholder="Ingrese el código de reserva">
+  <button (click)="getReservation()" [disabled]="!isReservationCodeValid()">Buscar Reserva</button>
+</div>
+
+<div *ngIf="reservation" class="reservation-details">
+  <h3>Reserva: {{ reservation.id }}</h3>
+  <p><strong>Vuelo:</strong> {{ reservation.flight }}</p>
+  <h4>Pasajeros:</h4>
+  <ul>
+    <li *ngFor="let passenger of reservation.passengers">{{ passenger.name }}</li>
+  </ul>
+</div>
+
+<div class="seat-map" *ngIf="flightData">
+  <div *ngIf="showErrorMessage" class="error-modal">
+    <div class="error-content">
+      <h3>Error</h3>
+      <p>{{ errorMessage }}</p>
+      <button (click)="closeErrorMessage()">Cerrar</button>
+    </div>
+  </div>
+  <div *ngIf="!showErrorMessage">
+    <!-- Mapa de asientos -->
+    <div *ngFor="let row of seatRows" class="row">
+      <div
+        *ngFor="let seat of row"
+        [ngClass]="['seat', seat.status]"
+        (mouseover)="onMouseOver(seat, $event)"
+        (mouseleave)="onMouseLeave()"
+        (click)="onSeatClick(seat)">
+        {{ seat.seat }}
+      </div>
+    </div>
+  </div>
+  <h3>Vuelo: {{ flightData.flight }} ({{ flightData.aircraft }})</h3>
+  <h4>Aeropuerto: {{ flightData.airport.name }}</h4>
+  <p>Salida: {{ flightData.departure | date: 'short' }}</p>
+
+  <div class="seats">
+    <div *ngFor="let row of seatRows" class="row">
+      <div class="row-left">
+        <div *ngFor="let seat of row.left"
+             [ngClass]="['seat', seat.status]"
+             class="seat"
+             (mouseover)="onMouseOver(seat, $event)"
+             (mouseleave)="onMouseLeave()"
+             (click)="onSeatClick(seat)">
+          {{ seat.seat }}
+          <div *ngIf="seatMessage && seat.status !== 'available'" class="seat-message">
+            {{ seatMessage }}
+          </div>
+        </div>
+      </div>
+      <div class="pasillo"></div>
+      <div class="row-right">
+        <div *ngFor="let seat of row.right"
+             [ngClass]="{'available': seat.status === 'available', 'reserved': seat.status === 'reserved', 'temp': seat.status === 'temp'}"
+             class="seat">
+          {{ seat.seat }}
+        </div>
+      </div>
+    </div>
+    <!-- Mensaje de asiento -->
+    <div
+      *ngIf="currentSeatMessage && currentSeatPosition"
+      class="seat-tooltip"
+      [ngStyle]="{ top: currentSeatPosition.top, left: currentSeatPosition.left }">
+      {{ currentSeatMessage }}
+    </div>
+  </div>
+
+  <!-- Botón Confirmar Reserva -->
+  <button
+    [disabled]="!isConfirmButtonEnabled"
+    class="confirm-button"
+    (click)="confirmReservation()">
+    Confirmar Reserva
+  </button>
+</div>
