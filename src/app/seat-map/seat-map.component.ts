@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import {Component, Injectable} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common'; // Importamos CommonModule para *ngIf y *ngFor
 import { HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
 import { FormsModule } from '@angular/forms'; // Importamos FormsModule para ngModel
 import { DatePipe } from '@angular/common'; // Importamos DatePipe para el pipe 'date'
+import { environment } from '../../environments/environment';
 
 interface Passenger {
   name: string;
@@ -43,8 +44,15 @@ interface Flight {
   styleUrls: ['./seat-map.component.css']
 })
 
+@Injectable({
+  providedIn: 'root',
+})
+
 export class SeatMapComponent {
-  reservationCode: string = ''; // Código de reserva ingresado
+
+  host: string = `${environment.production ? `${environment.apis.be}` : `${environment.apis.be}`}`;
+
+  reservationCode: string = 'A'; // Código de reserva ingresado
   reservation: any = null; // Detalles de la reserva
   flightData: any = null; // Datos del vuelo y mapa de asientos
   seatRows: any[] = []; // Filas de asientos
@@ -63,7 +71,8 @@ export class SeatMapComponent {
   }
 
   getReservation() {
-      this.http.get<Reservation>(`https://my-json-server.typicode.com/TUP-UTN-FRC-LCIII/flight-check-in-dummy/reservations/${this.reservationCode}`)
+    console.log('Api call:', `${this.host}reservations/${this.reservationCode}`);
+      this.http.get<Reservation>(`${this.host}reservations/${this.reservationCode}`)
         .subscribe({
           next: (data) => {
             console.log('Estado de la reserva:', data.status);
@@ -74,10 +83,12 @@ export class SeatMapComponent {
               this.reservation = null;
               this.errorMessage = this.getErrorMessageForStatus(data.status);
               return; // Terminar ejecución si el estado no es válido
+            } else {
+              // Estado válido, continuar con la lógica
+              this.showErrorMessage = false;
+              this.reservation = data;
+              this.getFlightData(data.flight);
             }
-            // Estado válido, continuar con la lógica
-            this.reservation = data;
-            this.getFlightData(data.flight);
           },
           error: (err) => {
             console.error('Error al obtener la reserva:', err);
@@ -88,7 +99,7 @@ export class SeatMapComponent {
   }
 
   getFlightData(flightId: string) {
-    this.http.get<Flight>(`https://my-json-server.typicode.com/TUP-UTN-FRC-LCIII/flight-check-in-dummy/flights/${flightId}`)
+    this.http.get<Flight>(`${this.host}flights/${flightId}`)
       .subscribe({
         next: (data) => {
           this.flightData = data;
@@ -189,7 +200,7 @@ export class SeatMapComponent {
     this.reservation.status = 'CHECKED-IN';
 
     // Realizar el PUT para actualizar la reserva
-    this.http.put<Reservation>(`https://my-json-server.typicode.com/TUP-UTN-FRC-LCIII/flight-check-in-dummy/reservations/${this.reservation.id}`, this.reservation)
+    this.http.put<Reservation>(`${this.host}reservations/${this.reservation.id}`, this.reservation)
       .subscribe(
         (response) => {
           console.log('Reserva confirmada:', response);
