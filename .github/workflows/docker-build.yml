@@ -54,8 +54,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: |
             ENVIRONMENT=production
-          cache-from: type=registry,ref=ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:buildcache
-          cache-to: type=registry,ref=ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest
+          cache-to: type=registry,ref=ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest,mode=max
 
       - name: Verify Docker image
         run: |
