@@ -1,6 +1,6 @@
 
 // environment.prod.ts producción con nginx segun backend
-const API_URL = 'http://flights:8081/';
+const API_URL = 'http://flights:8080/';
 
 export const environment = {
   production: true,
