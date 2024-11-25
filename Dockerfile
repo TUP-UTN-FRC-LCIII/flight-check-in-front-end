@@ -28,7 +28,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist/flight-checkin/browser /usr/share/nginx/html
 
 # Copy env.js and env.sh
-COPY src/env.js /usr/share/nginx/html/env.js
+COPY env.js /usr/share/nginx/html/env.js
 COPY env.sh /docker-entrypoint.d/env.sh
 
 # Make env.sh executable
