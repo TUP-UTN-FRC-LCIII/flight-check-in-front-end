@@ -65,7 +65,7 @@ jobs:
           RUN apk add --no-cache gettext
           
           # Copiar archivos de la aplicación
-          COPY dist/flight-check-in-front-end /usr/share/nginx/html
+          COPY dist/* /usr/share/nginx/html/
           COPY nginx.conf /etc/nginx/conf.d/default.conf
           COPY env.sh /docker-entrypoint.sh
           
@@ -101,7 +101,9 @@ jobs:
           echo "API_URL=$API_URL" >> $GITHUB_ENV
 
       - name: Build Angular app for production
-        run: npm run build:prod
+        run: |
+          npm run build:prod
+          ls -la dist/
         env:
           API_URL: ${{ env.API_URL }}
 
