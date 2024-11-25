@@ -1,0 +1,148 @@
+name: Angular Docker CI
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Backend API URL'
+        required: false
+        default: 'http://flights:8080/'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Crear los archivos necesarios para la build
+      - name: Create required files
+        run: |
+          # Crear env.js
+          echo '(function(window) {
+              window["env"] = window["env"] || {};
+              window["env"]["API_URL"] = "${API_URL}";
+              window["env"]["ENVIRONMENT"] = "${ENVIRONMENT}";
+          })(this);' > src/env.js
+          
+          # Crear env.sh
+          echo '#!/bin/sh
+          env_file="/usr/share/nginx/html/env.js"
+          echo "(function(window) {" > $env_file
+          echo "    window['"'"'env'"'"'] = window['"'"'env'"'"'] || {};" >> $env_file
+          echo "    window['"'"'env'"'"']['"'"'API_URL'"'"'] = '"'"'${API_URL}'"'"';" >> $env_file
+          echo "    window['"'"'env'"'"']['"'"'ENVIRONMENT'"'"'] = '"'"'${ENVIRONMENT}'"'"';" >> $env_file
+          echo "})(this);" >> $env_file' > env.sh
+          
+          # Crear nginx.conf
+          echo 'server {
+              listen 4200;
+              server_name localhost;
+              root /usr/share/nginx/html;
+              index index.html;
+              location / {
+                  try_files $uri $uri/ /index.html;
+              }
+              location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+                  expires 1y;
+                  add_header Cache-Control "public, no-transform";
+              }
+              location /env.js {
+                  expires -1;
+                  add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+              }
+          }' > nginx.conf
+          
+          # Hacer ejecutable env.sh
+          chmod +x env.sh
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set API URL
+        run: |
+          API_URL=${{ github.event.inputs.api_url || 'http://flights:8080/' }}
+          echo "Using API URL: $API_URL"
+          echo "API_URL=$API_URL" >> $GITHUB_ENV
+
+      - name: Build Angular app for production
+        run: npm run build:prod
+        env:
+          API_URL: ${{ env.API_URL }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end
+          tags: |
+            type=raw,value=latest
+            type=ref,event=branch
+            type=sha,format=short
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENVIRONMENT=production
+            API_URL=${{ env.API_URL }}
+          cache-from: type=registry,ref=ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:buildcache
+          cache-to: type=registry,ref=ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:buildcache,mode=max
+
+      - name: Verify Docker image
+        run: |
+          docker pull ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest
+          docker image inspect ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest
+
+      # Verificar la configuración y el contenido de env.js
+      - name: Verify Configuration
+        run: |
+          echo "Configured API URL: ${{ env.API_URL }}"
+          docker run --rm ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest cat /usr/share/nginx/html/env.js
+          docker run --rm ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest env | grep API_URL
+
+      - name: Create Build Info
+        if: success()
+        run: |
+          echo "Build completed successfully" > build-info.txt
+          echo "API URL: ${{ env.API_URL }}" >> build-info.txt
+          echo "Image: ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest" >> build-info.txt
+          echo "Build Date: $(date)" >> build-info.txt
+          echo "nginx.conf configuration:" >> build-info.txt
+          cat nginx.conf >> build-info.txt
+          echo "env.js content:" >> build-info.txt
+          cat src/env.js >> build-info.txt
+
+      - name: Upload Build Info
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-info
+          path: build-info.txt
+          retention-days: 30

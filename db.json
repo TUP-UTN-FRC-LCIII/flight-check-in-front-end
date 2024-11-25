@@ -1,0 +1,229 @@
+{
+  "reservations": [
+    {
+      "id": "AF456B",
+      "status": "CHECKED-IN",
+      "flight": "AR1550",
+      "passengers": [
+        {
+          "name": "Diego Maradona"
+        },
+        {
+          "name": "Guillermo Coppola"
+        }
+      ]
+    },
+    {
+      "id": "AF4569",
+      "status": "READY-TO-CHECK-IN",
+      "flight": "AR1551",
+      "passengers": [
+        {
+          "name": "Diego Maradona"
+        },
+        {
+          "name": "Guillermo Coppola"
+        },
+        {
+          "name": "Carlos Menem"
+        }
+      ]
+    },
+    {
+      "id": "AF4570",
+      "status": "DUE",
+      "flight": "AR1551",
+      "passengers": [
+        {
+          "name": "Diego Maradona"
+        },
+        {
+          "name": "Guillermo Coppola"
+        }
+      ]
+    },
+    {
+      "id": "AF4571",
+      "status": "PENDING",
+      "flight": "AR1551",
+      "passengers": [
+        {
+          "name": "Diego Maradona"
+        },
+        {
+          "name": "Guillermo Coppola"
+        }
+      ]
+    }
+  ],
+  "flights": [
+    {
+      "id": "AR1550",
+      "aircraft": "Boeing 737-800",
+      "departure": "2024-12-01T15:30:00Z",
+      "airport": {
+        "name": "Aeropuerto Internacional de Ciudad de México",
+        "code": "MMMX",
+        "location": "Ciudad de México, México"
+      },
+      "seat_map": [
+        {
+          "seat": "1A",
+          "status": "reserved"
+        },
+        {
+          "seat": "1B",
+          "status": "available"
+        },
+        {
+          "seat": "1C",
+          "status": "available"
+        },
+        {
+          "seat": "1D",
+          "status": "available"
+        },
+        {
+          "seat": "1E",
+          "status": "reserved"
+        },
+        {
+          "seat": "1F",
+          "status": "available"
+        },
+        {
+          "seat": "2A",
+          "status": "available"
+        },
+        {
+          "seat": "2B",
+          "status": "temp"
+        },
+        {
+          "seat": "2C",
+          "status": "available"
+        },
+        {
+          "seat": "2D",
+          "status": "reserved"
+        },
+        {
+          "seat": "2E",
+          "status": "reserved"
+        },
+        {
+          "seat": "2F",
+          "status": "available"
+        },
+        {
+          "seat": "3A",
+          "status": "available"
+        },
+        {
+          "seat": "3B",
+          "status": "reserved"
+        },
+        {
+          "seat": "3C",
+          "status": "available"
+        },
+        {
+          "seat": "3D",
+          "status": "available"
+        },
+        {
+          "seat": "3E",
+          "status": "available"
+        },
+        {
+          "seat": "3F",
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "id": "AR1551",
+      "aircraft": "Boeing 737-800",
+      "departure": "2024-12-01T20:30:00Z",
+      "airport": {
+        "name": "Aeropuerto Internacional de Ciudad de México",
+        "code": "MMMX",
+        "location": "Ciudad de México, México"
+      },
+      "seat_map": [
+        {
+          "seat": "1A",
+          "status": "reserved"
+        },
+        {
+          "seat": "1B",
+          "status": "temp"
+        },
+        {
+          "seat": "1C",
+          "status": "temp"
+        },
+        {
+          "seat": "1D",
+          "status": "available"
+        },
+        {
+          "seat": "1E",
+          "status": "reserved"
+        },
+        {
+          "seat": "1F",
+          "status": "available"
+        },
+        {
+          "seat": "2A",
+          "status": "available"
+        },
+        {
+          "seat": "2B",
+          "status": "temp"
+        },
+        {
+          "seat": "2C",
+          "status": "available"
+        },
+        {
+          "seat": "2D",
+          "status": "reserved"
+        },
+        {
+          "seat": "2E",
+          "status": "reserved"
+        },
+        {
+          "seat": "2F",
+          "status": "available"
+        },
+        {
+          "seat": "3A",
+          "status": "available"
+        },
+        {
+          "seat": "3B",
+          "status": "temp"
+        },
+        {
+          "seat": "3C",
+          "status": "available"
+        },
+        {
+          "seat": "3D",
+          "status": "temp"
+        },
+        {
+          "seat": "3E",
+          "status": "available"
+        },
+        {
+          "seat": "3F",
+          "status": "available"
+        }
+      ]
+    }
+  ]
+}

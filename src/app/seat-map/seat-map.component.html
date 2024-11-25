@@ -1,0 +1,140 @@
+<div class="seat-map-container">
+    <!-- Spinner -->
+    <div *ngIf="isLoading" class="spinner-overlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <!-- Mensaje de éxito -->
+    <div *ngIf="showSuccessMessage" class="success-message">
+        <div class="success-content">
+            <span class="success-icon">✓</span>
+            <p>{{ successMessage }}</p>
+        </div>
+    </div>
+
+    <!-- Búsqueda de reserva -->
+    <div class="search-container">
+        <h2>Check-in de Vuelo</h2>
+        <div class="reservation-search">
+            <label for="reservationCode">Código de reserva:</label>
+            <div class="input-group">
+                <input type="text"
+                       id="reservationCode"
+                       [(ngModel)]="reservationCode"
+                       placeholder="Ingrese el código de reserva"
+                       [disabled]="isLoading">
+                <button (click)="getReservation()"
+                        [disabled]="!isReservationCodeValid() || isLoading"
+                        class="search-button">
+                    {{ isLoading ? 'Buscando...' : 'Buscar Reserva' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div *ngIf="showErrorMessage" class="error-message">
+        <div class="error-content">
+            <p>{{ errorMessage }}</p>
+            <button class="close-button" (click)="closeErrorMessage()">×</button>
+        </div>
+    </div>
+
+    <!-- Contenido de la reserva -->
+    <ng-container *ngIf="reservation && !showSuccessMessage">
+        <!-- Detalles de la reserva -->
+        <div class="reservation-details">
+            <div class="reservation-header">
+                <h3>Reserva: {{ reservation.id }}</h3>
+                <p class="flight-number"><strong>Vuelo:</strong> {{ reservation.flight }}</p>
+            </div>
+
+            <div class="passengers-section">
+                <h4>Pasajeros:</h4>
+                <ul class="passengers-list">
+                    <li *ngFor="let passenger of reservation.passengers">{{ passenger.name }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Mapa de asientos -->
+        <div class="seat-map" *ngIf="flightData">
+            <div class="flight-info">
+                <h3>Vuelo: {{ flightData.flight }} ({{ flightData.aircraft }})</h3>
+                <h4>Aeropuerto: {{ flightData.airport.name }}</h4>
+                <p class="departure-time">Salida: {{ flightData.departure | date: 'short' }}</p>
+            </div>
+
+            <!-- Indicador de selección -->
+            <div class="seat-selection-status">
+                <p>{{ currentSeatMessage }}</p>
+                <p *ngIf="seatMessage" class="seat-message">{{ seatMessage }}</p>
+            </div>
+
+            <!-- Mapa de asientos -->
+            <div class="seats-container">
+                <div *ngFor="let row of seatRows" class="seat-row">
+                    <!-- Asientos izquierda -->
+                    <div class="seat-group left">
+                        <div *ngFor="let seat of row.left"
+                             [ngClass]="['seat', seat.status]"
+                             (mouseover)="onMouseOver(seat, $event)"
+                             (mouseleave)="onMouseLeave()"
+                             (click)="onSeatClick(seat)">
+                            {{ seat.seat }}
+                        </div>
+                    </div>
+
+                    <!-- Pasillo -->
+                    <div class="aisle"></div>
+
+                    <!-- Asientos derecha -->
+                    <div class="seat-group right">
+                        <div *ngFor="let seat of row.right"
+                             [ngClass]="['seat', seat.status]"
+                             (mouseover)="onMouseOver(seat, $event)"
+                             (mouseleave)="onMouseLeave()"
+                             (click)="onSeatClick(seat)">
+                            {{ seat.seat }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tooltip de asiento -->
+            <div *ngIf="currentSeatMessage && currentSeatPosition"
+                 class="seat-tooltip"
+                 [ngStyle]="{ top: currentSeatPosition.top, left: currentSeatPosition.left }">
+                {{ currentSeatMessage }}
+            </div>
+
+            <!-- Leyenda -->
+            <div class="seat-legend">
+                <div class="legend-item">
+                    <div class="seat available"></div>
+                    <span>Disponible</span>
+                </div>
+                <div class="legend-item">
+                    <div class="seat reserved"></div>
+                    <span>Ocupado</span>
+                </div>
+                <div class="legend-item">
+                    <div class="seat temp"></div>
+                    <span>Seleccionado</span>
+                </div>
+            </div>
+
+            <!-- Botón de confirmación -->
+            <div class="confirmation-section">
+                <button class="confirm-button"
+                        [disabled]="!isConfirmButtonEnabled"
+                        (click)="confirmReservation()">
+                    Confirmar Reserva
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</div>
