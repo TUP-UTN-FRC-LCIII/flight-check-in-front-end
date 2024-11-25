@@ -29,18 +29,15 @@ jobs:
           # Crear env.js
           echo '(function(window) {
               window["env"] = window["env"] || {};
-              window["env"]["API_URL"] = "${API_URL}";
-              window["env"]["ENVIRONMENT"] = "${ENVIRONMENT}";
+              window["env"]["API_URL"] = "$API_URL";
+              window["env"]["ENVIRONMENT"] = "$ENVIRONMENT";
           })(this);' > src/env.js
           
           # Crear env.sh
           echo '#!/bin/sh
-          env_file="/usr/share/nginx/html/env.js"
-          echo "(function(window) {" > $env_file
-          echo "    window['"'"'env'"'"'] = window['"'"'env'"'"'] || {};" >> $env_file
-          echo "    window['"'"'env'"'"']['"'"'API_URL'"'"'] = '"'"'${API_URL}'"'"';" >> $env_file
-          echo "    window['"'"'env'"'"']['"'"'ENVIRONMENT'"'"'] = '"'"'${ENVIRONMENT}'"'"';" >> $env_file
-          echo "})(this);" >> $env_file' > env.sh
+          envsubst < /usr/share/nginx/html/env.js > /usr/share/nginx/html/env.js.tmp
+          mv /usr/share/nginx/html/env.js.tmp /usr/share/nginx/html/env.js
+          nginx -g "daemon off;"' > env.sh
           
           # Crear nginx.conf
           echo 'server {
@@ -60,6 +57,30 @@ jobs:
                   add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
               }
           }' > nginx.conf
+          
+          # Crear Dockerfile
+          echo 'FROM nginx:alpine
+          
+          # Instalar envsubst
+          RUN apk add --no-cache gettext
+          
+          # Copiar archivos de la aplicación
+          COPY dist/flight-check-in-front-end /usr/share/nginx/html
+          COPY nginx.conf /etc/nginx/conf.d/default.conf
+          COPY env.sh /docker-entrypoint.sh
+          
+          # Hacer el script ejecutable
+          RUN chmod +x /docker-entrypoint.sh
+          
+          # Variables de entorno por defecto
+          ENV API_URL=http://flights:8080/
+          ENV ENVIRONMENT=production
+          
+          # Exponer puerto
+          EXPOSE 4200
+          
+          # Ejecutar script de entrada
+          CMD ["/docker-entrypoint.sh"]' > Dockerfile
           
           # Hacer ejecutable env.sh
           chmod +x env.sh
@@ -124,7 +145,7 @@ jobs:
       - name: Verify Configuration
         run: |
           echo "Configured API URL: ${{ env.API_URL }}"
-          docker run --rm ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest cat /usr/share/nginx/html/env.js
+          docker run --rm -e API_URL=${{ env.API_URL }} -e ENVIRONMENT=production ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest sh -c 'envsubst < /usr/share/nginx/html/env.js'
           docker run --rm ghcr.io/tup-utn-frc-lciii/flight-check-in-front-end:latest env | grep API_URL
 
       - name: Create Build Info
