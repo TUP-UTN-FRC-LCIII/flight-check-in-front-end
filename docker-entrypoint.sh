@@ -3,6 +3,7 @@
 # Generate env.js with current environment variables
 /usr/local/bin/generate-env.sh
 
+
 if [ "$ENVIRONMENT" = "development" ]; then
     echo "Starting in DEVELOPMENT mode"
     ng serve --configuration=development --host 0.0.0.0 --poll=2000
